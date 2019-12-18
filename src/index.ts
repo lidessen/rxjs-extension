@@ -1,9 +1,7 @@
 import { Subject, Observable, of, timer, interval, from } from 'rxjs';
 import { mergeMapTo, take, tap, mergeMap } from 'rxjs/operators';
-// import { hash } from './utils';
-function hash(target: object) {
-  return JSON.stringify(target);
-}
+import { hash } from './utils';
+
 export class TimeSliceSubject<T> extends Subject<T> {
   private value!: T;
   private free = true;
@@ -60,17 +58,3 @@ export function cacheable<T extends (...args: any[]) => Observable<any>>(
     return cache[key];
   }) as T;
 }
-
-const get = () => {
-  return from(
-    new Promise(resolve => {
-      setTimeout(() => resolve(new Date()), 2000);
-    })
-  );
-};
-
-const cachedGet = cacheable(get, 2000);
-
-interval(1001)
-  .pipe(take(5))
-  .subscribe(val => cachedGet().subscribe(v => console.log(val + 1, v)));
