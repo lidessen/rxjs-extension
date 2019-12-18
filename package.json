@@ -1,0 +1,45 @@
+{
+  "name": "rxjs-extension",
+  "version": "0.0.0",
+  "description": "rxjs extension",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest",
+    "pretty": "prettier --write **/*.ts **/*.tsx **/*.scss **/*.json !**/*.d.ts",
+    "eslint": "eslint --fix . --ext .ts,.tsx",
+    "lint": "npm run pretty && npm run eslint",
+    "build": "tsc"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ztytotoro/TsLibrary.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ztytotoro/TsLibrary/issues"
+  },
+  "homepage": "https://github.com/ztytotoro/TsLibrary#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@typescript-eslint/eslint-plugin": "^2.2.0",
+    "@typescript-eslint/typescript-estree": "^2.2.0",
+    "eslint": "^6.3.0",
+    "eslint-config-prettier": "^6.2.0",
+    "eslint-plugin-import": "^2.18.2",
+    "jest": "^24.9.0",
+    "prettier": "1.18.2",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.6.2"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.3"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es5",
+    "jsx": "react",
+    "outDir": "dist",
+    "module": "commonjs"
+  },
+  "exclude": ["**/*.spec.tsx", "node_modules", "dist"]
+}
