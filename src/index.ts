@@ -1,6 +1,6 @@
-import { Subject, Observable, of } from 'rxjs';
+import { Subject, Observable, of, from } from 'rxjs';
 import { tap, mergeMap } from 'rxjs/operators';
-import { hash } from './utils';
+import { hash, isAsyncOrPromise } from './utils';
 
 export class TimeSliceSubject<T> extends Subject<T> {
   private value!: T;
@@ -23,37 +23,47 @@ export class TimeSliceSubject<T> extends Subject<T> {
   }
 }
 
-export function timeSlice<T extends (...args: any[]) => Observable<any>>(
-  func: T,
-  timeout: number
-) {
+export function timeSlice<
+  T extends (...args: any[]) => Observable<any> | Promise<any>
+>(func: T, timeout: number) {
   const subject = new TimeSliceSubject<any[]>(timeout);
   return ((...args: any[]) => {
     subject.next(args);
-    return subject.pipe(
+    let isPromise = false;
+    const result = subject.pipe(
       mergeMap(val => {
-        return func(val);
+        const rawResult = func(val);
+        isPromise = isAsyncOrPromise(rawResult);
+        return rawResult;
       })
     );
+    if (isPromise) {
+      return result.toPromise();
+    } else {
+      return result;
+    }
   }) as T;
 }
 
-export function cacheable<T extends (...args: any[]) => Observable<any>>(
-  func: T,
-  timeout: number = 0
-) {
-  const cache: { [key: string]: Observable<any> } = {};
+export function cacheable<
+  T extends (...args: any[]) => Observable<any> | Promise<any>
+>(func: T, timeout: number = 0) {
+  const cache: { [key: string]: Observable<any> | Promise<any> } = {};
+  let isPromise = false;
   return ((...args: any[]) => {
     const key = hash(args);
     if (!cache[key]) {
-      cache[key] = func(...args).pipe(
-        tap(result => {
-          cache[key] = of(result);
+      const rawResult = func(...args);
+      isPromise = isAsyncOrPromise(rawResult);
+      const result = from(rawResult).pipe(
+        tap(value => {
+          cache[key] = isPromise ? Promise.resolve(value) : of(value);
           setTimeout(() => {
             delete cache[key];
           }, timeout);
         })
       );
+      cache[key] = isPromise ? result.toPromise() : result;
     }
     return cache[key];
   }) as T;
