@@ -1,14 +1,14 @@
 {
   "name": "rxjs-extension",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "rxjs extension",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "jest",
     "pretty": "prettier --write **/*.ts **/*.tsx **/*.scss **/*.json !**/*.d.ts",
     "eslint": "eslint --fix . --ext .ts,.tsx",
     "lint": "npm run pretty && npm run eslint",
-    "build": "tsc"
+    "build": "tsc && "
   },
   "files": [
     "src",
