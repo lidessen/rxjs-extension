@@ -2,7 +2,7 @@
 
 ## Usage
 
-### TimeSliceSubject
+### `TimeSliceSubject`
 
 Give a time , only latest values of each period will be published
 
@@ -25,7 +25,7 @@ interval(1000).subscribe(val => subject.next(val + 1));
  */
 ```
 
-### timeSlice
+### `timeSlice`
 
 turn a `Observalbe<T>` to time sliced `Observalbe<T>`, this is very useful when serval modify to signle object in a short time but you only want to post the data to server once with the latest value
 
@@ -55,7 +55,7 @@ interval(1000)
 */
 ```
 
-### cacheable
+### `cacheable`
 
 This function will make a subscription cacheable
 
