@@ -1,5 +1,5 @@
-import { Subject, Observable, of, timer, interval, from } from 'rxjs';
-import { mergeMapTo, take, tap, mergeMap } from 'rxjs/operators';
+import { Subject, Observable, of } from 'rxjs';
+import { tap, mergeMap } from 'rxjs/operators';
 import { hash } from './utils';
 
 export class TimeSliceSubject<T> extends Subject<T> {
