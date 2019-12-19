@@ -1,26 +1,34 @@
 {
   "name": "rxjs-extension",
-  "version": "0.2.5",
-  "description": "rxjs extension",
+  "version": "0.2.8",
+  "description": "rxjs extensions",
   "main": "./index.js",
   "module": "./index.js",
+  "keywords": [
+    "rxjs",
+    "cache",
+    "http",
+    "decorator",
+    "extension"
+  ],
   "scripts": {
     "test": "jest",
     "pretty": "prettier --write **/*.ts **/*.tsx **/*.scss **/*.json !**/*.d.ts",
     "eslint": "eslint --fix . --ext .ts,.tsx",
     "lint": "npm run pretty && npm run eslint",
-    "build": "tsc && copyfiles package.json dist"
+    "build": "tsc && copyfiles package.json README.md LICENSE dist",
+    "pub": "npm run build && npm publish dist"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ztytotoro/TsLibrary.git"
+    "url": "git+https://github.com/ztytotoro/rxjs-extension.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ztytotoro/TsLibrary/issues"
+    "url": "https://github.com/ztytotoro/rxjs-extension/issues"
   },
-  "homepage": "https://github.com/ztytotoro/TsLibrary#readme",
+  "homepage": "https://github.com/ztytotoro/rxjs-extension#readme",
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@typescript-eslint/eslint-plugin": "^2.2.0",
