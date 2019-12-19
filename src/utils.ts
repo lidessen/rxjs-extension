@@ -1,3 +1,5 @@
+import { Observable, from } from 'rxjs';
+
 export function hash(target: object) {
   return JSON.stringify(target);
 }
@@ -11,5 +13,14 @@ export function isAsyncOrPromise(fn: any) {
 export function timeout(ms: number) {
   return new Promise(resolve => {
     setTimeout(() => resolve(), ms);
+  });
+}
+
+export async function toPromise(
+  fn: (...args: any[]) => Observable<any> | Promise<any>,
+  args: any[]
+) {
+  return await new Promise(resolve => {
+    from(fn(...args)).subscribe(val => resolve(val));
   });
 }

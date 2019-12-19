@@ -1,6 +1,6 @@
 import { Subject, Observable, of, from } from 'rxjs';
 import { tap, mergeMap } from 'rxjs/operators';
-import { hash } from './utils';
+import { hash, toPromise } from './utils';
 
 export class TimeSliceSubject<T> extends Subject<T> {
   private value!: T;
@@ -54,7 +54,7 @@ export function cacheable<
   return function(this: any, ...args: any[]) {
     const key = hash(args);
     if (!cache[key]) {
-      const rawResult = func.apply(this, args);
+      const rawResult = toPromise(func.bind(this), args);
       const result = from(rawResult).pipe(
         tap(value => {
           cache[key] = isPromise ? Promise.resolve(value) : of(value);
@@ -63,7 +63,13 @@ export function cacheable<
           }, timeout);
         })
       );
-      cache[key] = isPromise ? result.toPromise() : result;
+      cache[key] = isPromise
+        ? new Promise(resolve => {
+            result.subscribe(val => {
+              resolve(val);
+            });
+          })
+        : result;
     }
     return cache[key];
   } as T;
