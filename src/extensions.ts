@@ -1,6 +1,6 @@
 import { Subject, Observable, of, from } from 'rxjs';
 import { tap, mergeMap } from 'rxjs/operators';
-import { hash, isAsyncOrPromise } from './utils';
+import { hash } from './utils';
 
 export class TimeSliceSubject<T> extends Subject<T> {
   private value!: T;
@@ -25,36 +25,36 @@ export class TimeSliceSubject<T> extends Subject<T> {
 
 export function timeSlice<
   T extends (...args: any[]) => Observable<any> | Promise<any>
->(func: T, timeout: number) {
+>(func: T, isPromise: boolean, timeout: number) {
   const subject = new TimeSliceSubject<any[]>(timeout);
-  return ((...args: any[]) => {
+  return function(this: any, ...args: any[]) {
     subject.next(args);
-    let isPromise = false;
     const result = subject.pipe(
       mergeMap(val => {
-        const rawResult = func(val);
-        isPromise = isAsyncOrPromise(rawResult);
+        const rawResult = func.apply(this, val);
         return rawResult;
       })
     );
     if (isPromise) {
-      return result.toPromise();
+      return new Promise(resolve => {
+        result.subscribe(val => {
+          resolve(val);
+        });
+      });
     } else {
       return result;
     }
-  }) as T;
+  } as T;
 }
 
 export function cacheable<
   T extends (...args: any[]) => Observable<any> | Promise<any>
->(func: T, timeout: number = 0) {
+>(func: T, isPromise: boolean, timeout: number = 0) {
   const cache: { [key: string]: Observable<any> | Promise<any> } = {};
-  let isPromise = false;
-  return ((...args: any[]) => {
+  return function(this: any, ...args: any[]) {
     const key = hash(args);
     if (!cache[key]) {
-      const rawResult = func(...args);
-      isPromise = isAsyncOrPromise(rawResult);
+      const rawResult = func.apply(this, args);
       const result = from(rawResult).pipe(
         tap(value => {
           cache[key] = isPromise ? Promise.resolve(value) : of(value);
@@ -66,5 +66,5 @@ export function cacheable<
       cache[key] = isPromise ? result.toPromise() : result;
     }
     return cache[key];
-  }) as T;
+  } as T;
 }

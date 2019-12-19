@@ -1,10 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES6",
     "jsx": "react",
     "outDir": "dist",
-    "module": "commonjs",
+    "module": "ES6",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
