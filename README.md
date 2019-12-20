@@ -2,9 +2,9 @@
 
 ## Usage
 
-### `TimeSliceSubject`
+### `TimeSliceSubject<T>`
 
-Give a time , only latest values of each period will be published
+In each time slice, only the latest value will be published
 
 ```ts
 import { interval } from 'rxjs';
@@ -25,15 +25,26 @@ interval(1000).subscribe(val => subject.next(val + 1));
  */
 ```
 
-### `timeSlice`
+### `timeSlice | @timeSlice`
 
-turn a `Observalbe<T>` to time sliced `Observalbe<T>`, this is very useful when serval modify to signle object in a short time but you only want to post the data to server once with the latest value
+#### Wrap a function `T`
+
+```ts
+T extends (...args: any[]) => Observable<any> | Promise<any>
+```
+
+Then return a time sliced function.
+
+#### Example
 
 ```ts
 import { interval } from 'rxjs';
 import { timeSlice } from 'rxjs-extension';
 
-const save = (n: number) => of(`${n} saved!`);
+const save = (n: number) => {
+  console.log('save called');
+  of(`${n} saved!`);
+};
 
 const timeSlicedSave = timeSlice(
   save,
@@ -45,7 +56,9 @@ interval(1000)
   .pipe(take(5))
   .subscribe(val => timeSlicedSave(val + 1).subscribe(console.log));
 
-/* log:
+/* output:
+
+save called
 
 5 saved! ​​​​​
 
@@ -56,12 +69,11 @@ interval(1000)
 5 saved! ​​​​​
 
 5 saved! ​​​
+
 */
 ```
 
-### `timeSlice decorator`
-
-turn a `Observalbe<T>` to time sliced `Observalbe<T>`, this is very useful when serval modify to signle object in a short time but you only want to post the data to server once with the latest value
+#### Example for decorator
 
 ```ts
 import { interval } from 'rxjs';
@@ -80,19 +92,24 @@ test.save(1).then(console.log);
 test.save(2).then(console.log);
 test.save(3).then(console.log);
 
-/* logs:
+/* output:
  *
  * 3 saved! ​​​​​
  *
  * 3 saved!
  *  ​​​​​
  * 3 saved! ​​​​​
+ *
  */
 ```
 
-### `cacheable`
+### `cacheable | @cacheable`
 
-This function will make a subscription cacheable
+This function will make a subscription cacheable.
+
+For examle: we send a request and wait for respone, before request finished, we have a same request again, now we want to just use the last request's result
+
+#### Example
 
 ```ts
 const get = () => {
@@ -123,9 +140,7 @@ const cachedGet = cacheable(
 
 the result will be cached for 2s
 
-### `cacheable decorator`
-
-usage same as timeSlice
+#### Example for decorator
 
 ```ts
 import { interval } from 'rxjs';
