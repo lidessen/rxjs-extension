@@ -105,9 +105,15 @@ test.save(3).then(console.log);
 
 ### `cacheable | @cacheable`
 
-This function will make a subscription cacheable.
+#### This function will Wrap a function `T`
 
-For examle: we send a request and wait for respone, before request finished, we have a same request again, now we want to just use the last request's result
+```ts
+T extends (...args: any[]) => Observable<any> | Promise<any>
+```
+
+Then return a function can cache result
+
+For example: we send a request and wait for respone, before request finished, we have a same request again, now we want to just use the last request's result
 
 #### Example
 
