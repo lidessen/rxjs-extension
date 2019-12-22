@@ -2,26 +2,49 @@ import { cacheable as cache, timeSlice as slice } from './extensions';
 import 'reflect-metadata';
 import { isAsyncOrPromise } from './utils';
 
-export function cacheable(timeout: number = 0) {
-  return function(
-    target: any,
-    key: string | symbol,
-    descriptor: PropertyDescriptor
-  ) {
-    const type = Reflect.getMetadata('design:returntype', target, key);
-    descriptor.value = cache(descriptor.value, isAsyncOrPromise(type), timeout);
-    return descriptor;
-  };
+export enum ResultType {
+    Promise = 'Promise',
+    Observable = 'Observable',
+    Detect = 'Detect'
 }
 
-export function timeSlice(timeout: number) {
-  return function(
-    target: any,
-    key: string | symbol,
-    descriptor: PropertyDescriptor
-  ) {
-    const type = Reflect.getMetadata('design:returntype', target, key);
-    descriptor.value = slice(descriptor.value, isAsyncOrPromise(type), timeout);
-    return descriptor;
-  };
+export function cacheable(timeout = 0, resultType = ResultType.Detect) {
+    return function (
+        target: any,
+        key: string | symbol,
+        descriptor: PropertyDescriptor
+    ) {
+        let isPromise = false;
+        if (resultType === ResultType.Detect) {
+            const type = Reflect.getMetadata('design:returntype', target, key);
+            if (type && isAsyncOrPromise(type)) {
+                isPromise = true;
+            }
+        } else {
+            isPromise = (resultType === ResultType.Promise);
+        }
+
+        descriptor.value = cache(descriptor.value, isPromise, timeout);
+        return descriptor;
+    };
+}
+
+export function timeSlice(timeout: number, resultType = ResultType.Detect) {
+    return function (
+        target: any,
+        key: string | symbol,
+        descriptor: PropertyDescriptor
+    ) {
+        let isPromise = false;
+        if (resultType === ResultType.Detect) {
+            const type = Reflect.getMetadata('design:returntype', target, key);
+            if (type && isAsyncOrPromise(type)) {
+                isPromise = true;
+            }
+        } else {
+            isPromise = (resultType === ResultType.Promise);
+        }
+        descriptor.value = slice(descriptor.value, isPromise, timeout);
+        return descriptor;
+    };
 }
