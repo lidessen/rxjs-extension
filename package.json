@@ -1,6 +1,6 @@
 {
   "name": "rxjs-extension",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "description": "rxjs extensions",
   "main": "./index.js",
   "module": "./index.js",

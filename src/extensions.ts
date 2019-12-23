@@ -1,5 +1,5 @@
 import { Subject, Observable, of, from } from 'rxjs';
-import { tap, mergeMap } from 'rxjs/operators';
+import { tap, mergeMap, take } from 'rxjs/operators';
 import { hash, toPromise } from './utils';
 
 export class TimeSliceSubject<T> extends Subject<T> {
@@ -26,15 +26,16 @@ export class TimeSliceSubject<T> extends Subject<T> {
 export function timeSlice<
   T extends (...args: any[]) => Observable<any> | Promise<any>
 >(func: T, isPromise: boolean, timeout: number) {
-  const subject = new TimeSliceSubject<any[]>(timeout);
+  const subject = new TimeSliceSubject<() => Observable<any> | Promise<any>>(
+    timeout
+  );
+  const result = subject.pipe(
+    take(1),
+    mergeMap(res => res())
+  );
   return function(this: any, ...args: any[]) {
-    subject.next(args);
-    const result = subject.pipe(
-      mergeMap(val => {
-        const rawResult = func.apply(this, val);
-        return rawResult;
-      })
-    );
+    const rawResult = cacheable(() => func.apply(this, args), isPromise);
+    subject.next(rawResult);
     if (isPromise) {
       return new Promise(resolve => {
         result.subscribe(val => {
