@@ -77,7 +77,7 @@ save called
 
 ```ts
 import { interval } from 'rxjs';
-import { timeSlice } from 'rxjs-extension/operators';
+import { timeSlice } from 'rxjs-extension/decorators';
 
 class Test {
   @timeSlice(500)
@@ -101,6 +101,22 @@ test.save(3).then(console.log);
  * 3 saved! ​​​​​
  *
  */
+```
+
+If you use decorators without typescript or the decorator cannot determin the return type, you need to specify the return type manually.
+
+```ts
+import { ResultType } from 'rxjs-extension/decorators';
+
+class Test {
+  @timeSlice(
+    500,
+    ResultType.Promise | ResultType.Observable | ResultType.Detect
+  ) // default is detect
+  save(n: number) {
+    return of(`${n} saved!`);
+  }
+}
 ```
 
 ### `cacheable | @cacheable`
@@ -150,7 +166,7 @@ the result will be cached for 2s
 
 ```ts
 import { interval } from 'rxjs';
-import { cacheable } from 'rxjs-extension/operators';
+import { cacheable } from 'rxjs-extension/decorators';
 
 class Test {
   @cacheable()
