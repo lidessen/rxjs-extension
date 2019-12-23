@@ -1,7 +1,8 @@
 import { Observable, from } from 'rxjs';
+import md5 from 'md5-ts';
 
 export function hash(target: object) {
-  return JSON.stringify(target);
+  return md5(JSON.stringify(target));
 }
 
 export const AsyncFunction = async function() {}.constructor;
