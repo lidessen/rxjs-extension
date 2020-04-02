@@ -1,5 +1,5 @@
-import { Subject, Observable, of, from } from 'rxjs';
-import { tap, mergeMap, take } from 'rxjs/operators';
+import { Subject, Observable, of, from, throwError } from 'rxjs';
+import { tap, mergeMap, take, catchError } from 'rxjs/operators';
 import { hash, toPromise } from './utils';
 
 export class TimeSliceSubject<T> extends Subject<T> {
@@ -37,10 +37,15 @@ export function timeSlice<
     const rawResult = cacheable(() => func.apply(this, args), isPromise);
     subject.next(rawResult);
     if (isPromise) {
-      return new Promise(resolve => {
-        result.subscribe(val => {
-          resolve(val);
-        });
+      return new Promise((resolve, reject) => {
+        result.subscribe(
+          val => {
+            resolve(val);
+          },
+          error => {
+            reject(error);
+          }
+        );
       });
     } else {
       return result;
@@ -62,13 +67,22 @@ export function cacheable<
           setTimeout(() => {
             delete cache[key];
           }, timeout);
+        }),
+        catchError(error => {
+          cache[key] = isPromise ? Promise.reject(error) : throwError(error);
+          throw error;
         })
       );
       cache[key] = isPromise
-        ? new Promise(resolve => {
-            result.subscribe(val => {
-              resolve(val);
-            });
+        ? new Promise((resolve, reject) => {
+            result.subscribe(
+              val => {
+                resolve(val);
+              },
+              error => {
+                reject(error);
+              }
+            );
           })
         : result;
     }
