@@ -21,7 +21,10 @@ export async function toPromise(
   fn: (...args: any[]) => Observable<any> | Promise<any>,
   args: any[]
 ) {
-  return await new Promise(resolve => {
-    from(fn(...args)).subscribe(val => resolve(val));
+  return await new Promise((resolve, reject) => {
+    from(fn(...args)).subscribe(
+      val => resolve(val),
+      error => reject(error)
+    );
   });
 }
